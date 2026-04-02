@@ -10,7 +10,7 @@ body{
     display: grid;
     grid-template-columns: repeat(15, 40px);
     grid-auto-rows: 40px;
-    gap: 2px;
+    gap: 5px;
     margin-top: 20px;
 }
 
