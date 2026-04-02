@@ -3,6 +3,11 @@ const gridSize = 10;
 const grid = [];
 const gridElement = document.getElementById("grid");
 const wordListElement = document.getElementById("word-list");
+const directions = [
+    {name: "horizontal", dr: 0, dc: 1},
+    {name: "vertical", dr: 1, dc: 0},
+    {name: "diagonal", dr: 1, dc: 1}
+];
 
 let selectedCells = [];
 
@@ -18,14 +23,7 @@ for (let i = 0; i < gridSize; i++) {
 }
 
 // Place words horizontally
-words.forEach(word => {
-  let row = Math.floor(Math.random() * gridSize);
-  let startCol = Math.floor(Math.random() * (gridSize - word.length));
-
-  for (let i = 0; i < word.length; i++) {
-    grid[row][startCol + i] = word[i];
-  }
-});
+words.forEach(placeWord);
 
 // Fill empty cells with random letters
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -91,5 +89,45 @@ function checkWord() {
 
   if (words.includes(letters)) {
     selectedCells.forEach(c => c.classList.add("found"));
+  }
+}
+
+
+function placeWord(word){
+    let placed = false;
+
+    while(!placed){
+        const dir = directions[Math.floor(Math.random() * directions.length)];
+
+        const maxRow = gridSize - (dir.dr ? word.length : 0);
+        const maxCol = gridSize - (dir.dc ? word.length : 0);
+
+        const row = Math.floor(Math.random() * (maxRow + 1));
+        const col = Math.floor(Math.random() * (maxCol + 1));
+
+        if(canPlace(word, row, col, dir)){
+            writeWord(word, row, col, dir);
+            placed = true;
+        }
+    }
+}
+
+function canPlace(word, row, col, dir) {
+  for (let i = 0; i < word.length; i++) {
+    const r = row + i * dir.dr;
+    const c = col + i * dir.dc;
+
+    if (grid[r][c] !== "" && grid[r][c] !== word[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function writeWord(word, row, col, dir) {
+  for (let i = 0; i < word.length; i++) {
+    const r = row + i * dir.dr;
+    const c = col + i * dir.dc;
+    grid[r][c] = word[i];
   }
 }
