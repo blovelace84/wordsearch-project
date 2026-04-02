@@ -41,6 +41,16 @@ body{
   font-size: 18px;
 }
 
+.word-item {
+  margin-right: 10px;
+}
+
+.word-item.found {
+  text-decoration: line-through;
+  color: #4caf50;
+  font-weight: bold;
+}
+
 #reset-btn {
   margin-top: 10px;
   padding: 10px 20px;

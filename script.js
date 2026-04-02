@@ -9,6 +9,7 @@ const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 let grid = [];
 let selectedCells = [];
 let isSelecting = false;
+let foundWords = new Set();
 
 const gridElement = document.getElementById("grid");
 const wordListElement = document.getElementById("word-list");
@@ -28,6 +29,7 @@ const directions = [
 function generateGame() {
   gridElement.innerHTML = "";
   selectedCells = [];
+  foundWords.clear();
 
   // Reset grid
   grid = Array.from({ length: gridSize }, () =>
@@ -50,8 +52,9 @@ function generateGame() {
   renderGrid();
 
   // Update word list
-  wordListElement.innerHTML =
-    "<strong>Find these words:</strong><br>" + words.join(", ");
+  wordListElement.innerHTML = words
+    .map(w => `<span id="word-${w}" class="word-item">${w}</span>`)
+    .join(" ");
 }
 
 function placeWord(word) {
@@ -153,11 +156,25 @@ function clearSelection() {
   selectedCells = [];
 }
 
-function checkWord() {
+function checkWord(){
   const letters = selectedCells.map(c => c.textContent).join("");
+  const reversedLetters = letters.split("").reverse().join("");
+  const matchedWord = words.includes(letters)
+    ? letters
+    : words.includes(reversedLetters)
+      ? reversedLetters
+      : null;
 
-  if (words.includes(letters)) {
+  if (matchedWord && !foundWords.has(matchedWord)) {
+    foundWords.add(matchedWord);
+    //Mark grid cells to indicate found word
     selectedCells.forEach(c => c.classList.add("found"));
+
+    //cross out word in list
+    const wordItem = document.getElementById(`word-${matchedWord}`);
+    if(wordItem){
+      wordItem.classList.add("found");
+    }
   }
 }
 
