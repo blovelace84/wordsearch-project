@@ -1,72 +1,149 @@
-body{
-  font-family: Arial, Helvetica, sans-serif;
-  display: flex;
-  flex-direction: column;
-  background: green;
-  align-items: center;
-  justify-content: flex-start;
-  height: 100vh;
-  margin: 0;
-  overflow: hidden;
+:root {
+  --bg-top: #dff7e9;
+  --bg-bottom: #b5e2d0;
+  --panel: rgba(255, 255, 255, 0.76);
+  --text: #103226;
+  --accent: #1e9f76;
+  --accent-deep: #157558;
+  --cell-size: clamp(24px, 2.15vw, 38px);
+  --cell-gap: 3px;
 }
 
-#grid{
-    display: grid;
-    grid-template-columns: repeat(15, 32px);
-    grid-auto-rows: 32px;
-    gap: 2px;
-    margin-top: 20px;
-    margin-bottom: 20px;
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px 16px 30px;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.65), transparent 35%),
+    radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.5), transparent 28%),
+    linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+}
+
+h1 {
+  margin: 8px 0 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: clamp(1.5rem, 2.4vw, 2.2rem);
+}
+
+#reset-btn {
+  margin-top: 4px;
+  padding: 11px 22px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  color: #f4fff9;
+  background: linear-gradient(135deg, var(--accent), #34c48f);
+  box-shadow: 0 8px 20px rgba(20, 84, 64, 0.28);
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+#reset-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(20, 84, 64, 0.33);
+}
+
+#word-list {
+  margin: 16px 0 8px;
+  max-width: min(760px, 95vw);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.92rem;
+}
+
+.word-item {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(16, 50, 38, 0.12);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.word-item.found {
+  text-decoration: line-through;
+  color: var(--accent-deep);
+  border-color: rgba(21, 117, 88, 0.35);
+  background: rgba(148, 227, 195, 0.55);
+}
+
+#grid {
+  display: grid;
+  grid-template-columns: repeat(15, var(--cell-size));
+  grid-auto-rows: var(--cell-size);
+  gap: var(--cell-gap);
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--panel);
+  border: 1px solid rgba(16, 50, 38, 0.12);
+  box-shadow:
+    0 18px 35px rgba(22, 72, 57, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 .cell {
-  width: 32px;
-  height: 32px;
-  background: white;
-  border: 1px solid #ccc;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  border-radius: 9px;
+  border: 1px solid rgba(16, 50, 38, 0.18);
+  background: linear-gradient(180deg, #ffffff, #edf8f2);
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   user-select: none;
-  font-weight: bold;
+  font-weight: 800;
+  color: #163b2d;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: transform 90ms ease, background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.cell:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 50, 38, 0.18);
 }
 
 .cell.selected {
-  background: #ffeb3b;
+  background: linear-gradient(180deg, #ffe583, #ffd651);
+  border-color: #e6b014;
 }
 
 .cell.found {
-  background: darkcyan;
-  color: white;
+  background: linear-gradient(180deg, #1ea87c, #157558);
+  color: #f4fff9;
+  border-color: #105743;
+  text-shadow: none;
 }
 
-#word-list {
-  margin-top: 20px;
-  font-size: 18px;
-}
+@media (max-width: 760px) {
+  body {
+    padding: 16px 8px 20px;
+  }
 
-.word-item {
-  margin-right: 10px;
-}
+  :root {
+    --cell-size: clamp(20px, 5.6vw, 30px);
+    --cell-gap: 2px;
+  }
 
-.word-item.found {
-  text-decoration: line-through;
-  color: black;
-  font-weight: bold;
-}
-
-#reset-btn {
-  margin-top: 10px;
-  padding: 10px 20px;
-  font-size: 16px;
-  background: #2196f3;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-#reset-btn:hover {
-  background: #1976d2;
+  #grid {
+    padding: 10px;
+    border-radius: 14px;
+  }
 }
