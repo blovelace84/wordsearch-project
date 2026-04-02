@@ -1,8 +1,19 @@
-const words = ["CAT", "DOG", "BIRD", "FISH"];
-const gridSize = 10;
-const grid = [];
+const words = [
+  "CAT","DOG","BIRD","FISH","HORSE","MOUSE","SNAKE","TIGER","LION","BEAR",
+  "EAGLE","SHARK","WHALE","ZEBRA","SHEEP","GOAT","FROG","DUCK","OTTER","PANDA"
+];
+
+const gridSize = 15;
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+let grid = [];
+let selectedCells = [];
+let isSelecting = false;
+
 const gridElement = document.getElementById("grid");
 const wordListElement = document.getElementById("word-list");
+
+// Directions including reverse
 const directions = [
   { name: "horizontal-right", dr: 0, dc: 1 },
   { name: "horizontal-left", dr: 0, dc: -1 },
@@ -12,51 +23,105 @@ const directions = [
   { name: "diagonal-up-left", dr: -1, dc: -1 }
 ];
 
+// -------------------- GAME GENERATION --------------------
 
-let selectedCells = [];
+function generateGame() {
+  gridElement.innerHTML = "";
+  selectedCells = [];
 
-// Display word list
-wordListElement.innerHTML = "<strong>Find these words:</strong> " + words.join(", ");
+  // Reset grid
+  grid = Array.from({ length: gridSize }, () =>
+    Array.from({ length: gridSize }, () => "")
+  );
 
-// Create empty grid
-for (let i = 0; i < gridSize; i++) {
-  grid[i] = [];
-  for (let j = 0; j < gridSize; j++) {
-    grid[i][j] = "";
+  // Place words
+  words.forEach(placeWord);
+
+  // Fill empty cells
+  for (let r = 0; r < gridSize; r++) {
+    for (let c = 0; c < gridSize; c++) {
+      if (grid[r][c] === "") {
+        grid[r][c] = alphabet[Math.floor(Math.random() * alphabet.length)];
+      }
+    }
   }
+
+  // Render
+  renderGrid();
+
+  // Update word list
+  wordListElement.innerHTML =
+    "<strong>Find these words:</strong><br>" + words.join(", ");
 }
 
-// Place words horizontally
-words.forEach(placeWord);
+function placeWord(word) {
+  let placed = false;
+  let attempts = 0;
 
-// Fill empty cells with random letters
-const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-for (let r = 0; r < gridSize; r++) {
-  for (let c = 0; c < gridSize; c++) {
-    if (grid[r][c] === "") {
-      grid[r][c] = alphabet[Math.floor(Math.random() * alphabet.length)];
+  while (!placed && attempts < 500) {
+    attempts++;
+    const dir = directions[Math.floor(Math.random() * directions.length)];
+
+    const minRow = dir.dr === -1 ? word.length - 1 : 0;
+    const maxRow = dir.dr === 1 ? gridSize - word.length : gridSize - 1;
+    const minCol = dir.dc === -1 ? word.length - 1 : 0;
+    const maxCol = dir.dc === 1 ? gridSize - word.length : gridSize - 1;
+
+    const row = Math.floor(Math.random() * (maxRow - minRow + 1)) + minRow;
+    const col = Math.floor(Math.random() * (maxCol - minCol + 1)) + minCol;
+
+    if (canPlace(word, row, col, dir)) {
+      writeWord(word, row, col, dir);
+      placed = true;
     }
   }
 }
 
-// Render grid
-for (let r = 0; r < gridSize; r++) {
-  for (let c = 0; c < gridSize; c++) {
-    const cell = document.createElement("div");
-    cell.classList.add("cell");
-    cell.textContent = grid[r][c];
-    cell.dataset.row = r;
-    cell.dataset.col = c;
+function canPlace(word, row, col, dir) {
+  for (let i = 0; i < word.length; i++) {
+    const r = row + i * dir.dr;
+    const c = col + i * dir.dc;
 
-    cell.addEventListener("mousedown", startSelection);
-    cell.addEventListener("mouseover", continueSelection);
-    cell.addEventListener("mouseup", endSelection);
+    if (r < 0 || r >= gridSize || c < 0 || c >= gridSize) {
+      return false;
+    }
 
-    gridElement.appendChild(cell);
+    if (grid[r][c] !== "" && grid[r][c] !== word[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function writeWord(word, row, col, dir) {
+  for (let i = 0; i < word.length; i++) {
+    const r = row + i * dir.dr;
+    const c = col + i * dir.dc;
+    grid[r][c] = word[i];
   }
 }
 
-let isSelecting = false;
+// -------------------- RENDERING --------------------
+
+function renderGrid() {
+  for (let r = 0; r < gridSize; r++) {
+    for (let c = 0; c < gridSize; c++) {
+      const cell = document.createElement("div");
+      cell.classList.add("cell");
+      cell.textContent = grid[r][c];
+      cell.dataset.row = r;
+      cell.dataset.col = c;
+
+      cell.addEventListener("mousedown", startSelection);
+      cell.addEventListener("mouseover", continueSelection);
+      cell.addEventListener("mouseup", endSelection);
+
+      gridElement.appendChild(cell);
+    }
+  }
+}
+
+// -------------------- SELECTION LOGIC --------------------
 
 function startSelection(e) {
   isSelecting = true;
@@ -96,42 +161,9 @@ function checkWord() {
   }
 }
 
+// -------------------- RESET BUTTON --------------------
 
-function placeWord(word) {
-    let placed = false;
-    while(!placed) {
-        const dir = directions[Math.floor(Math.random() * directions.length)];
+document.getElementById("reset-btn").addEventListener("click", generateGame);
 
-        //compute valid starting bounds
-        const maxRow = dir.dr === 1 ? gridSize - word.length : dir.dr === -1 ? word.length - 1 : gridSize - 1;
-        const maxCol = dir.dc === 1 ? gridSize - word.length : dir.dc === -1 ? word.length - 1 : gridSize - 1;
-
-        const row = Math.floor(Math.random() * (maxRow + 1));
-        const col = Math.floor(Math.random() * (maxCol + 1));
-
-        if(canPlace(word, row, col, dir)){
-            writeWord(word, row, col, dir);
-            placed = true;
-        }
-    }
-}
-
-function canPlace(word, row, col, dir) {
-  for (let i = 0; i < word.length; i++) {
-    const r = row + i * dir.dr;
-    const c = col + i * dir.dc;
-
-    if (grid[r][c] !== "" && grid[r][c] !== word[i]) {
-      return false;
-    }
-  }
-  return true;
-}
-
-function writeWord(word, row, col, dir) {
-  for (let i = 0; i < word.length; i++) {
-    const r = row + i * dir.dr;
-    const c = col + i * dir.dc;
-    grid[r][c] = word[i];
-  }
-}
+// Start game
+generateGame();
