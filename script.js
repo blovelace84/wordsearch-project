@@ -4,10 +4,14 @@ const grid = [];
 const gridElement = document.getElementById("grid");
 const wordListElement = document.getElementById("word-list");
 const directions = [
-    {name: "horizontal", dr: 0, dc: 1},
-    {name: "vertical", dr: 1, dc: 0},
-    {name: "diagonal", dr: 1, dc: 1}
+  { name: "horizontal-right", dr: 0, dc: 1 },
+  { name: "horizontal-left", dr: 0, dc: -1 },
+  { name: "vertical-down", dr: 1, dc: 0 },
+  { name: "vertical-up", dr: -1, dc: 0 },
+  { name: "diagonal-down-right", dr: 1, dc: 1 },
+  { name: "diagonal-up-left", dr: -1, dc: -1 }
 ];
+
 
 let selectedCells = [];
 
@@ -93,14 +97,14 @@ function checkWord() {
 }
 
 
-function placeWord(word){
+function placeWord(word) {
     let placed = false;
-
-    while(!placed){
+    while(!placed) {
         const dir = directions[Math.floor(Math.random() * directions.length)];
 
-        const maxRow = gridSize - (dir.dr ? word.length : 0);
-        const maxCol = gridSize - (dir.dc ? word.length : 0);
+        //compute valid starting bounds
+        const maxRow = dir.dr === 1 ? gridSize - word.length : dir.dr === -1 ? word.length - 1 : gridSize - 1;
+        const maxCol = dir.dc === 1 ? gridSize - word.length : dir.dc === -1 ? word.length - 1 : gridSize - 1;
 
         const row = Math.floor(Math.random() * (maxRow + 1));
         const col = Math.floor(Math.random() * (maxCol + 1));
