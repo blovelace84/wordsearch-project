@@ -132,6 +132,14 @@ h1 {
   text-shadow: none;
 }
 
+#complete-message{
+  margin-top: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #4caf50;
+  display: none;
+}
+
 @media (max-width: 760px) {
   body {
     padding: 16px 8px 20px;

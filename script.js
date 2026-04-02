@@ -10,6 +10,7 @@ let grid = [];
 let selectedCells = [];
 let startCell = null;
 let direction = null;
+let foundCount = 0;
 let isSelecting = false;
 let foundWords = new Set();
 
@@ -263,24 +264,31 @@ function clearSelection() {
   selectedCells = [];
 }
 
+function showCompletionMessage(){
+  const msg = document.getElementById("complete-message");
+  msg.textContent = "🎉 Congratulations! You found all the words!";
+  msg.style.display = "block";
+}
+
 function checkWord(){
   const letters = selectedCells.map(c => c.textContent).join("");
-  const reversedLetters = letters.split("").reverse().join("");
-  const matchedWord = words.includes(letters)
-    ? letters
-    : words.includes(reversedLetters)
-      ? reversedLetters
-      : null;
 
-  if (matchedWord && !foundWords.has(matchedWord)) {
-    foundWords.add(matchedWord);
-    //Mark grid cells to indicate found word
+  if(words.includes(letters)){
+    //Mark grid cells
     selectedCells.forEach(c => c.classList.add("found"));
 
     //cross out word in list
-    const wordItem = document.getElementById(`word-${matchedWord}`);
-    if(wordItem){
+    const wordItem = document.getElementById(`word-${letters}`);
+    if(wordItem && !wordItem.classList.contains("found")){
       wordItem.classList.add("found");
+
+      //Increase found count
+      foundCount++;
+
+      //check if puzzle is complete
+      if(foundCount === words.length){
+        showCompletionMessage();
+      }
     }
   }
 }
@@ -292,4 +300,5 @@ document.addEventListener("mouseup", endSelection);
 document.getElementById("reset-btn").addEventListener("click", generateGame);
 
 // Start game
-generateGame();
+generateGame(foundCount=0);
+document.getElementById("complete-message").style.display = "none";
