@@ -327,3 +327,6 @@ async function loadWords() {
 
 //Load words when page starts 
 loadWords();
+document.getElementById("reset-btn").addEventListener("click", () => {
+  loadWords();
+})
