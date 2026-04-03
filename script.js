@@ -30,6 +30,12 @@ const directions = [
 // -------------------- GAME GENERATION --------------------
 
 function generateGame() {
+  foundCount = 0;
+
+  const msg = document.getElementById("complete-message");
+  msg.style.display = "none";
+  msg.textContent = "";
+
   gridElement.innerHTML = "";
   selectedCells = [];
   foundWords.clear();
@@ -57,7 +63,7 @@ function generateGame() {
   // Update word list
   wordListElement.innerHTML = words
     .map(w => `<span id="word-${w}" class="word-item">${w}</span>`)
-    .join(" ");
+    .join(", ");
 }
 
 function placeWord(word) {
@@ -268,17 +274,21 @@ function showCompletionMessage(){
   const msg = document.getElementById("complete-message");
   msg.textContent = "🎉 Congratulations! You found all the words!";
   msg.style.display = "block";
+  console.log("Message Displayed!"); // For debugging
 }
 
 function checkWord(){
   const letters = selectedCells.map(c => c.textContent).join("");
 
   if(words.includes(letters)){
+
     //Mark grid cells
     selectedCells.forEach(c => c.classList.add("found"));
 
     //cross out word in list
     const wordItem = document.getElementById(`word-${letters}`);
+
+    //Only count it once
     if(wordItem && !wordItem.classList.contains("found")){
       wordItem.classList.add("found");
 
@@ -288,6 +298,7 @@ function checkWord(){
       //check if puzzle is complete
       if(foundCount === words.length){
         showCompletionMessage();
+        console.log("Puzzle complete!"); // For debugging
       }
     }
   }
