@@ -1,14 +1,10 @@
-const words = [
-  "CAT","DOG","BIRD","FISH","HORSE","MOUSE","SNAKE","TIGER","LION","BEAR",
-  "EAGLE","SHARK","WHALE","ZEBRA","SHEEP","GOAT","FROG","DUCK","OTTER","PANDA"
-];
-
 const gridSize = 15;
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 let grid = [];
 let selectedCells = [];
 let startCell = null;
+let words = [];
 let direction = null;
 let foundCount = 0;
 let isSelecting = false;
@@ -313,3 +309,21 @@ document.getElementById("reset-btn").addEventListener("click", generateGame);
 // Start game
 generateGame(foundCount=0);
 document.getElementById("complete-message").style.display = "none";
+
+// -------------------- LOAD WORDS --------------------
+async function loadWords() {
+  try{
+    const response = await fetch("words.json");
+    const data = await response.json();
+    words = data.words
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 20);
+
+    generateGame();
+  } catch(error){
+    console.error("Error loading words:", error);
+  }
+}
+
+//Load words when page starts 
+loadWords();
