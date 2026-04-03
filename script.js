@@ -305,6 +305,7 @@ function checkWord(){
 gridElement.addEventListener("mousemove", continueSelection);
 document.addEventListener("mouseup", endSelection);
 document.getElementById("reset-btn").addEventListener("click", generateGame);
+console.log("Words reloaded!"); // For debugging
 
 // Start game
 generateGame(foundCount=0);
