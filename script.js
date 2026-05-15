@@ -121,6 +121,7 @@ function renderGrid() {
       cell.dataset.col = c;
 
       cell.addEventListener("mousedown", startSelection);
+      cell.addEventListener("touchstart", startSelection, { passive: false });
 
       gridElement.appendChild(cell);
     }
@@ -130,22 +131,28 @@ function renderGrid() {
 // -------------------- SELECTION LOGIC --------------------
 
 function startSelection(e) {
-  if (!e.target.classList.contains("cell")) return;
+  e.preventDefault();
+  const target = e.touches ? e.touches[0].target : e.target;
+  if (!target.classList.contains("cell")) return;
 
   isSelecting = true;
   selectedCells = [];
-  startCell = e.target;
+  startCell = target;
   direction = null;
-  selectCell(e.target);
+  selectCell(target);
 }
 
 function continueSelection(e) {
   if (!isSelecting) return;
+  e.preventDefault();
 
-  const cell = getCellFromPoint(e.clientX, e.clientY);
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+  const cell = getCellFromPoint(clientX, clientY);
   if (!cell) return;
 
-  direction = getDirectionFromPointer(startCell, e.clientX, e.clientY);
+  direction = getDirectionFromPointer(startCell, clientX, clientY);
   if (!direction) {
     updateSelectionPath([startCell]);
     return;
@@ -303,7 +310,9 @@ function checkWord(){
 // -------------------- RESET BUTTON --------------------
 
 gridElement.addEventListener("mousemove", continueSelection);
+gridElement.addEventListener("touchmove", continueSelection, { passive: false });
 document.addEventListener("mouseup", endSelection);
+document.addEventListener("touchend", endSelection);
 document.getElementById("reset-btn").addEventListener("click", generateGame);
 console.log("Words reloaded!"); // For debugging
 
